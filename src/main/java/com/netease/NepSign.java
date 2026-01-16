@@ -57,13 +57,9 @@ public class NepSign extends AbstractJni {
         // 获取 Tools 类
         NepTools = vm.resolveClass("com/netease/nep/Tools");
         
-        // 尝试调用 JNI_OnLoad (可能会失败，如果 so 结构损坏)
-        try {
-            dm.callJNI_OnLoad(emulator);
-            System.out.println("[+] JNI_OnLoad 调用成功");
-        } catch (Exception e) {
-            System.out.println("[!] JNI_OnLoad 调用失败 (可能是正常的): " + e.getMessage());
-        }
+        // 跳过 JNI_OnLoad - 内存 dump 的 SO 不需要调用
+        // 签名函数可以直接通过地址调用
+        System.out.println("[*] 跳过 JNI_OnLoad (内存 dump SO 不需要初始化)");
     }
     
     /**
