@@ -8,37 +8,22 @@
 #   POST /sign_get  - GET 请求签名  {"url": "..."}
 #   GET  /health    - 健康检查
 
-FROM maven:3.8-openjdk-11 AS builder
+FROM maven:3.8-openjdk-11
 
-WORKDIR /build
+WORKDIR /app
+
+# 安装 curl 用于健康检查
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # 先复制 pom.xml 下载依赖 (利用 Docker 缓存)
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-# 复制源码并编译
+# 复制源码和 so 文件
 COPY src ./src
-RUN mvn package -DskipTests -q
 
-# 运行时镜像 (更小)
-FROM openjdk:11-jre-slim
-
-WORKDIR /app
-
-# 复制编译好的文件和依赖
-COPY --from=builder /build/target/classes /app/classes
-COPY --from=builder /root/.m2/repository /root/.m2/repository
-COPY --from=builder /build/pom.xml /app/
-
-# 复制 so 文件
-COPY src/main/resources/libnep.so /app/src/main/resources/
-
-# 安装 Maven (用于运行)
-RUN apt-get update && apt-get install -y maven curl && rm -rf /var/lib/apt/lists/*
-
-# 复制源码 (exec:java 需要)
-COPY src ./src
-COPY pom.xml .
+# 编译项目
+RUN mvn compile -q
 
 # 暴露端口
 EXPOSE 8080
