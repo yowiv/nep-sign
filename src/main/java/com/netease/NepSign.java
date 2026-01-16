@@ -3,12 +3,10 @@ package com.netease;
 import com.github.unidbg.AndroidEmulator;
 import com.github.unidbg.Emulator;
 import com.github.unidbg.Module;
-import com.github.unidbg.arm.backend.Unicorn2Factory;
 import com.github.unidbg.linux.android.AndroidEmulatorBuilder;
 import com.github.unidbg.linux.android.AndroidResolver;
 import com.github.unidbg.linux.android.dvm.*;
 import com.github.unidbg.memory.Memory;
-import com.github.unidbg.pointer.UnidbgPointer;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +35,6 @@ public class NepSign extends AbstractJni {
         // 创建 Android 模拟器 (ARM64)
         emulator = AndroidEmulatorBuilder.for64Bit()
                 .setProcessName("com.netease.gl")
-                .addBackendFactory(new Unicorn2Factory(true))
                 .build();
         
         // 配置内存
